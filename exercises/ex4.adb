@@ -2,21 +2,30 @@ with Ada.Text_Io;
 use Ada.Text_Io;
 
 procedure Ex4 is
-   Numbers : array (1 .. 10) of Integer;
+   type Turn is range 0 .. 1;
+   type Index is range 1 .. 10;
+   
+   Numbers : array (Index) of Integer;
    
    ------------------------------
-   type Turn is range 1 .. 2;
-
    protected Turn_Controller is
-      entry Take(Turn);
+      entry Take(Turn)(I : Index ; Value : Integer);
    private
       Last : Turn := 1;
+      Count : Turn := 0;
    end Turn_Controller;
    
    protected body Turn_Controller is
-      entry Take(for I in Turn) when Last /= I is
+      entry Take(for T in Turn)(I : Index; Value : Integer) when T /= Last is
       begin
-         Last := I;
+         Numbers(I) := Value;
+         if Count = 0 then
+            Count := 1;
+            Last := T;
+         else
+            Count := 0;
+         end if;
+         Put_Line("Writing " & Integer'Image(Value) & " to " & Index'Image(I));
       end Take;
    end Turn_Controller;
 
@@ -27,13 +36,12 @@ procedure Ex4 is
       task body Setter is
       begin
          for I in Numbers'Range loop
-            Turn_Controller.Take(Turn_Order);
-            Numbers(I) := Value;
+            Turn_Controller.Take(Turn_Order)(I, Value);
          end loop;
       end Setter;
       
-      Ones : Setter(1, 1);
-      Sevens : Setter(7, 2);
+      Ones : Setter(1, 0);
+      Sevens : Setter(7, 1);
 
    begin
       null;
