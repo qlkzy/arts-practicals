@@ -12,20 +12,19 @@ procedure Ex4 is
       entry Take(Turn)(I : Index ; Value : Integer);
    private
       Last : Turn := 1;
-      Count : Turn := 0;
+      Toggle : Turn := 0;
    end Turn_Controller;
    
    protected body Turn_Controller is
       entry Take(for T in Turn)(I : Index; Value : Integer) when T /= Last is
       begin
          Numbers(I) := Value;
-         if Count = 0 then
-            Count := 1;
+         if Toggle = 0 then
+            Toggle := 1;
             Last := T;
          else
-            Count := 0;
+            Toggle := 0;
          end if;
-         Put_Line("Writing " & Integer'Image(Value) & " to " & Index'Image(I));
       end Take;
    end Turn_Controller;
 
