@@ -20,7 +20,7 @@ procedure Ex5 is
          if Id = Releaser then
             Barrier_Open := True;
          else
-            requeue Controller.Wait with abort;
+            requeue Wait with abort;
          end if;
       end Call;
       
