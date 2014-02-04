@@ -4,8 +4,11 @@ with Ada.Real_Time;
 use Ada.Real_Time;
 with Ada.Execution_Time;
 use Ada.Execution_Time;
+with Ada.Execution_Time.Timers;
+use Ada.Execution_Time.Timers;
 
-procedure Ex12 is
+procedure Ex12 is   
+   type Timer is new Integer;
    
    procedure Finite_Work(Cycles : Integer) is
       F : Duration := 0.0;
@@ -22,14 +25,41 @@ procedure Ex12 is
       end loop;
    end Finite_Work;
    
+   protected Timeout is
+      entry Wait;
+      procedure Start;
+   private
+      procedure Handler(T : in out Timer);
+      Event : aliased Timer;
+      Allow : Boolean := False;
+   end Timeout;
+   
+   protected body Timeout is
+      entry Wait when Allow is
+      begin
+         Allow := False;
+      end Wait;
+      
+      procedure Start is
+      begin
+         Timer.Set_Handler(Milliseconds(200), Handler'Unrestricted_Access);
+      end Start;
+      
+      procedure Handler(T : in out Timer) is
+      begin
+         Allow := True;
+      end Handler;
+   end Timeout;
+   
    task Worker;
    
    task body Worker is
       Start : CPU_Time;
    begin
       Start := Ada.Execution_Time.Clock;
+      Timeout.Start;
       select
-         delay 0.2;
+         Timeout.Wait;
       then abort
          Finite_Work(10);
       end select;
