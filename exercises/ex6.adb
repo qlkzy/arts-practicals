@@ -14,12 +14,14 @@ procedure Ex6 is
       entry Wait(Client_Id);
       Barrier_Open : Boolean := False;
       Release : Client_Flags := (others => False);
+      Count : Integer := 0;
    end Controller;
 
    protected body Controller is
       entry Call(Id : Client_Id) when True is
       begin
-         if Id = Releaser then
+         Count := Count + 1;
+         if Count = Client_Flags'Length then
             Release(1) := True;
          end if;
          requeue Wait(Id);
