@@ -1,9 +1,12 @@
+pragma Task_Dispatching_Policy(FIFO_Within_Priorities);
+
 with Ada.Text_Io;
 use Ada.Text_Io;
 with Ada.Real_Time;
 use Ada.Real_Time;
 with System;
 use System;
+
 
 procedure Ex7 is
 
